@@ -15,6 +15,8 @@ public:
     vector<AnomalyReport> ar;
 
     HybridAnomalyDetector();
+    virtual float getThreshold();
+    virtual float setThreshold(float thresh);
 
     // does not need to be depend on the origin of the information (stream or file...)
     virtual void learnNormal(const TimeSeries& ts);

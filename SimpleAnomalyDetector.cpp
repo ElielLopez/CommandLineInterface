@@ -168,6 +168,15 @@ float SimpleAnomalyDetector::calcDistance(Point a, Point b) {
     return distance;
 }
 
+float SimpleAnomalyDetector::getThreshold() {
+    return this->m_threshold;
+}
+
+float SimpleAnomalyDetector::setThreshold(float th) {
+    this->m_threshold = th;
+    return th;
+}
+
 // destructor.
 SimpleAnomalyDetector::~SimpleAnomalyDetector() {
 

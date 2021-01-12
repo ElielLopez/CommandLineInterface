@@ -5,7 +5,6 @@
 #ifndef EX5_CLI_H
 #define EX5_CLI_H
 
-
 #include <string.h>
 #include "commands.h"
 
@@ -13,15 +12,16 @@ using namespace std;
 
 class CLI {
     DefaultIO* dio;
-    // you can add data members
-public:
 
-    //auto **commands = new Command*[6];
+public:
     Command **commands = new Command*[6];
+    //Command **commands;
+    void menuPrinter();
 
     CLI(DefaultIO* dio);
     void start();
     virtual ~CLI();
 };
+
 
 #endif //EX5_CLI_H

@@ -31,36 +31,80 @@ public:
 // you may edit this class
 class Command{
     DefaultIO* dio;
+    string description;
+    friend class uploadFile;
+    friend class algorithmSetting;
 public:
+
+    string getDescription() {
+        return description;
+    }
+
     Command(DefaultIO* dio):dio(dio){}
     virtual void execute()=0;
     virtual ~Command(){}
 };
 
-//-- command implement --
-
-class uploadCommand: public Command {
+// ----------------- implement here your command classes ------------------
 
 
+// uploadFile command gets a training file from client,
+// reads the file line by line and uploads it to the server.
+// then, gets a test file and upload it to the server.
+class uploadFile: public Command {
+
+public:
+    uploadFile(DefaultIO* dio):Command(dio) {
+        description = "1.upload a time series csv file";
+    }
+
+    void uploadTrainFile() {
+        dio->write("Please upload your local train CSV file.\n");
+        ofstream anomalyTraincsv;
+        anomalyTraincsv.open("anomalyTrain.csv");
+        string done = "done";
+        string line = dio->read();
+
+        while(!(line == done) || !(line == "done\n")) {
+            anomalyTraincsv<<line<<"\n";
+            line = dio->read();
+        }
+
+        anomalyTraincsv.close();
+        dio->write("Upload complete.\n");
+    }
+
+    void uploadTestFile() {
+        dio->write("Please upload your local test CSV file.\n");
+        ofstream anomalyTestcsv;
+        anomalyTestcsv.open("anomalyTest.csv");
+        string done = "done";
+        string line = dio->read();
+
+        while(!(line == done) || !(line == "done\n")) {
+            anomalyTestcsv<<line<<"\n";
+            line = dio->read();
+        }
+        anomalyTestcsv.close();
+        dio->write("Upload complete.\n");
+    }
+
+    void execute() override {
+        uploadTrainFile();
+        uploadTestFile();
+    };
 };
 
-class settingCommand: public Command {
+class algorithmSetting: public Command {
 
+public:
+    algorithmSetting(DefaultIO* dio): Command(dio) {
+        description = "2.algorithm settings";
+    }
 
-};
-
-class detectCommand: public Command {
-
-
-};
-
-class displayCommand: public Command {
-
-
-};
-
-class uploadAndAnalyzeCommand: public Command {
-
+    void execute() override {
+        dio->write("The current correlation threshold is ");
+    }
 };
 
 #endif //EX5_COMMANDS_H

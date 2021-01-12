@@ -62,3 +62,10 @@ vector<AnomalyReport> HybridAnomalyDetector::detect(const TimeSeries& ts) {
 
     return tempAR;
 }
+
+float HybridAnomalyDetector::getThreshold() {
+    return SimpleAnomalyDetector::getThreshold();
+}
+float HybridAnomalyDetector::setThreshold(float thresh) {
+    return SimpleAnomalyDetector::setThreshold(thresh);
+}
