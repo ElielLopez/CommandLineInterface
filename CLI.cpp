@@ -11,7 +11,7 @@ CLI::CLI(DefaultIO* dio) {
 void CLI::start(){
 
     int option = 0;
-    commands[0] = new uploadCommand();
+    //commands[0] = new uploadCommand();
 
     while(true) {
         dio->write("Welcome to the Anomaly Detection Server.\n");
