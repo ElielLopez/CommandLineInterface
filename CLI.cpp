@@ -15,7 +15,7 @@ CLI::CLI(DefaultIO* dio) {
 void CLI::menuPrinter() {
     dio->write("Welcome to the Anomaly Detection Server.\n");
     dio->write("Please choose an option:\n");
-    for(int i = 0; i < 1; i++) {
+    for(int i = 0; i < 2; i++) {
         dio->write(commands[i]->getDescription() + "\n");
     }
 }

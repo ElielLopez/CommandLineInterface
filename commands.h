@@ -32,6 +32,7 @@ public:
 class Command{
     DefaultIO* dio;
     string description;
+    HybridAnomalyDetector *ad;
     friend class uploadFile;
     friend class algorithmSetting;
 public:
@@ -97,6 +98,8 @@ public:
 
 class algorithmSetting: public Command {
 
+    float thresholdFromDetector;
+    float newThreshold = 0;
 public:
     algorithmSetting(DefaultIO* dio): Command(dio) {
         description = "2.algorithm settings";
@@ -104,6 +107,19 @@ public:
 
     void execute() override {
         dio->write("The current correlation threshold is ");
+        thresholdFromDetector = ad->getThreshold();
+        dio->write(thresholdFromDetector);
+        dio->write("\n");
+        dio->write("Type a new threshold\n");
+        dio->read(&newThreshold);
+        if(0 <= newThreshold && newThreshold <= 1) {
+            ad->setThreshold(newThreshold);
+            return;
+        } else {
+            dio->write("please choose a value between 0 and 1.\n");
+            dio->read();
+            execute();
+        }
     }
 };
 
