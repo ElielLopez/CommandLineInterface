@@ -77,8 +77,9 @@ int main(){
     CLI cli(&std);
     cli.start();
     std.close();
-    //check("output.txt","expectedOutput.txt");
-    check("output.txt","expected.txt");
+    check("output.txt","expectedOutput.txt");
+    //check("output.txt","expected.txt");
+    //check("expectedOutput.txt","expectedOutput.txt");
     cout<<"done"<<endl;
     return 0;
 }

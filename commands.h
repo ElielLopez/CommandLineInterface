@@ -30,11 +30,19 @@ public:
 
 // you may edit this class
 class Command{
-    DefaultIO* dio;
-    string description;
     HybridAnomalyDetector *ad;
+    DefaultIO* dio;
+
+    vector<AnomalyReport> anomalyReportVec;
+    string description;
+
     friend class uploadFile;
     friend class algorithmSetting;
+    friend class anomalyDetection;
+    friend class displayResults;
+    friend class uploadAndAnalayze;
+    friend class exitServer;
+
 public:
 
     string getDescription() {
@@ -66,7 +74,7 @@ public:
         string done = "done";
         string line = dio->read();
 
-        while(!(line == done) || !(line == "done\n")) {
+        while(!(line == done)) { //  || !(line == "done\n")
             anomalyTraincsv<<line<<"\n";
             line = dio->read();
         }
@@ -120,6 +128,68 @@ public:
             dio->read();
             execute();
         }
+    }
+};
+
+// server will run algorithms on the files the user uploaded previous to this step.
+class anomalyDetection: public Command {
+
+public:
+    anomalyDetection(DefaultIO* dio): Command(dio) {
+        description = "3.detect anomalies";
+    }
+
+    void execute() override {
+
+        TimeSeries ts1("anomalyTrain.csv");
+        TimeSeries ts2("anomalyTest.csv");
+
+        ad->learnNormal(ts1); //with training file
+        anomalyReportVec = ad->detect(ts2);
+
+        // after server running:
+        dio->write("anomaly detection complete.\n");
+    }
+};
+
+class displayResults: public Command {
+    int sizeOfVec = 0;
+public:
+    displayResults(DefaultIO* dio): Command(dio) {
+        description = "4.display results";
+    }
+
+    void execute() override {
+        sizeOfVec = anomalyReportVec.size();
+
+        for(int i = 0; i < sizeOfVec; i++) {
+            dio->write(anomalyReportVec[i].timeStep);
+            dio->write("\t");
+            dio->write(anomalyReportVec[i].description + "\n");
+        }
+        dio->write("Done.\n");
+    }
+};
+
+class uploadAndAnalayze:public Command {
+public:
+    uploadAndAnalayze(DefaultIO* dio):Command(dio) {
+        description = "5.upload anomalies and analyze results";
+    }
+
+    void execute() override {
+        dio->write("TEST upload&Analyze\n");
+    }
+};
+
+class exitServer: public Command {
+public:
+    exitServer(DefaultIO* dio): Command(dio) {
+        description = "6.exit";
+    }
+
+    void execute() override {
+
     }
 };
 

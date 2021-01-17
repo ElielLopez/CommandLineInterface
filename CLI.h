@@ -14,9 +14,10 @@ class CLI {
     DefaultIO* dio;
 
 public:
-    Command **commands = new Command*[6];
-    //Command **commands;
+    //Command **commands = new Command*[6];
+    Command **commands;
     void menuPrinter();
+    float userChoice();
 
     CLI(DefaultIO* dio);
     void start();
