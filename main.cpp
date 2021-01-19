@@ -72,8 +72,8 @@ void check(string outputFile,string expectedOutputFile){
 
 //small test
 int main(){
-    //STDtest std("input.txt","output.txt");
-    STDtest std("in.txt","output.txt");
+    STDtest std("input.txt","output.txt");
+    //STDtest std("in.txt","output.txt");
     CLI cli(&std);
     cli.start();
     std.close();

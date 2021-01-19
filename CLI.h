@@ -12,10 +12,11 @@ using namespace std;
 
 class CLI {
     DefaultIO* dio;
+    hybridAndVec* struc;
 
 public:
-    //Command **commands = new Command*[6];
     Command **commands;
+    Command **getCommands();
     void menuPrinter();
     float userChoice();
 
@@ -23,6 +24,5 @@ public:
     void start();
     virtual ~CLI();
 };
-
 
 #endif //EX5_CLI_H
