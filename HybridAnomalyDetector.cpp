@@ -1,9 +1,6 @@
 #include "HybridAnomalyDetector.h"
 
-HybridAnomalyDetector::HybridAnomalyDetector() {
-    // TODO Auto-generated constructor stub
-
-}
+HybridAnomalyDetector::HybridAnomalyDetector() {}
 
 HybridAnomalyDetector::~HybridAnomalyDetector() {
     ar.clear();
@@ -63,6 +60,7 @@ vector<AnomalyReport> HybridAnomalyDetector::detect(const TimeSeries& ts) {
     return tempAR;
 }
 
+// this functions added for ex5 for the user request.
 float HybridAnomalyDetector::getThreshold() {
     return SimpleAnomalyDetector::getThreshold();
 }

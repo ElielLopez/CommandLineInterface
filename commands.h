@@ -2,7 +2,6 @@
 #define EX5_COMMANDS_H
 
 #include<iostream>
-#include <string.h>
 #include <fstream>
 #include <vector>
 #include "HybridAnomalyDetector.h"
@@ -29,7 +28,7 @@ public:
     }
 };
 
-// addind hybrid and vector member and description for every command.
+// adding hybrid and vector member and description for every command.
 // also, every command will be friend of command.
 class Command{
     hybridAndVec* hav;
@@ -45,12 +44,14 @@ class Command{
 
 public:
 
+    // return the description of the command, used in the menu.
     string getDescription() {
         return description;
     }
 
+    // constructor
     Command(DefaultIO* dio, hybridAndVec* h):dio(dio), hav(h){}
-    Command(){}
+    //Command(){}
     virtual void execute()=0;
     virtual ~Command(){}
 };
@@ -100,6 +101,7 @@ public:
         dio->write("Upload complete.\n");
     }
 
+    // implements a simple file reading, line by line until the stop condition.
     void execute() override {
         uploadTrainFile();
         uploadTestFile();
@@ -113,7 +115,7 @@ public:
 // user inserts a valid value
 class algorithmSetting: public Command {
 
-    float thresholdFromDetector;
+    float thresholdFromDetector = 0;
     float newThreshold = 0;
 public:
     algorithmSetting(DefaultIO* dio, hybridAndVec* h):Command(dio, h) {
@@ -156,21 +158,27 @@ public:
         TimeSeries ts1("anomalyTrain.csv");
         TimeSeries ts2("anomalyTest.csv");
 
-        hav->ad2->learnNormal(ts1); //with training file
+        //calling learn normal with training file
+        hav->ad2->learnNormal(ts1);
+        // calling detect and returning a vector, saving the data into temporary vector.
         vector<AnomalyReport> tmp = hav->ad2->detect(ts2);
 
-        for(int i = 0; i <  tmp.size(); i++) {
-            hav->anomalyReportVec.push_back(tmp[i]);
+        for(auto & i : tmp) {
+            hav->anomalyReportVec.push_back(i);
         }
+
+        //for(int i = 0; i < tmp.size(); i++) {
+        //hav->anomalyReportVec.push_back(tmp[i]);
+        //}
 
         dio->write("anomaly detection complete.\n");
     }
 };
 
 // displaying the results of the anomaly report.
-// first diaplying time step and then the name of the fetures.
+// first displaying time step and then the name of the features.
 class displayResults: public Command {
-    int sizeOfVec = 0;
+    int sizeOfVec = hav->anomalyReportVec.size();
 public:
     displayResults(DefaultIO* dio, hybridAndVec* h):Command(dio, h) {
         description = "4.display results";
@@ -178,20 +186,32 @@ public:
     }
 
     void execute() override {
-        sizeOfVec = hav->anomalyReportVec.size();
 
         for(int i = 0; i < sizeOfVec; i++) {
             dio->write(hav->anomalyReportVec[i].timeStep);
             dio->write("\t");
             dio->write(hav->anomalyReportVec[i].description + "\n");
         }
+
         dio->write("Done.\n");
     }
 };
 
-//
+/*
+ * P- Positive- number of anomalies from the anomalies file
+ * FP- False Positive- every report outside time frame which had anomalies.
+ * TP- True Positive- time frame that had anomaly and had intersection bigger then 0
+ *     with anomaly report time
+ * N- Negative- time steps that did not had any anomaly in the file. N = n-29-6-20.
+ * n- number of row of the input
+ * how many reports were true: True positive rate = TP / P
+ * False alarm rate = FP / N
+ * */
 class uploadAndAnalayze:public Command {
-    float p, trueP, falseP; // number of anomalies,...
+    float P;
+    float FP;
+    float TP;
+    float N;
     float n;
 public:
     uploadAndAnalayze(DefaultIO* dio, hybridAndVec* h):Command(dio, h) {
@@ -220,9 +240,11 @@ public:
         description = "6.exit";
     }
 
-    void execute() override {
-
-    }
+    // did not get any implementation since in the start function
+    // if the user choose option 6 the condition will be satisfied
+    // and it will break the loop.
+    // the correct form of implementation of this unction will be in next exercise
+    void execute() override {}
 };
 
 #endif //EX5_COMMANDS_H

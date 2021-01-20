@@ -1,6 +1,5 @@
 #include "SimpleAnomalyDetector.h"
 
-
 // for every feature we will save the most correlated feature from the
 // list of feature.
 void SimpleAnomalyDetector::learnNormal(const TimeSeries& ts){
@@ -179,10 +178,5 @@ float SimpleAnomalyDetector::setThreshold(float th) {
 
 // destructor.
 SimpleAnomalyDetector::~SimpleAnomalyDetector() {
-
     cf.clear();
-    //cf.erase();
-//    for(auto it = cf.begin(); it != cf.end(); it++) {
-//
-//    }
 }
