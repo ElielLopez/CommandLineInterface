@@ -19,14 +19,16 @@ struct correlatedFeatures{
     Line lin_reg;
     float threshold;
     // new fields for the circle representation.
-    Point cf_center;
-    float cf_radius;
+    //Point cf_center;
+    //float cf_radius;
+    Circle c;
 };
 
 class SimpleAnomalyDetector:public TimeSeriesAnomalyDetector{
 
 public:
 
+    int tableSize;
     vector<correlatedFeatures> cf;
 
     float m_threshold;
@@ -50,6 +52,7 @@ public:
         return cf;
     }
 
+    virtual int getRowsNumber();
     virtual float calcDistance(Point a, Point b);
 
     // destructor.

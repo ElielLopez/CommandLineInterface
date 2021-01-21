@@ -16,6 +16,8 @@ void SimpleAnomalyDetector::learnNormal(const TimeSeries& ts){
     int sizeOfVector = 0;
     int maxCorrelatedFeatureIndex = 0;
 
+    // for getRowNumber function
+    this->tableSize = sizeOfDataTable;
 
     //int sizeTest = ts.getTableSize();
     // starting from the first feature, retrieving his values and the size of the container.
@@ -86,22 +88,25 @@ void SimpleAnomalyDetector::learnNormal(const TimeSeries& ts){
 
             Point* ps2[sizeOfVector];
             for(int i=0;i<sizeOfVector;i++)
-                ps2[i]=new Point(tmp1[i],tmp2[i]); // TODO delete ps
+                ps2[i]=new Point(tmp1[i],tmp2[i]);
 
             Circle c = mc.findMinCircle(ps2, sizeOfVector);
-            tmpCF2.cf_radius = c.radius; // minimum radius to cover all training points.
-            tmpCF2.cf_center = c.center;
+            //tmpCF2.cf_radius = c.radius; // minimum radius to cover all training points.
+            //tmpCF2.cf_center = c.center;
+            tmpCF2.c.radius = c.radius;
+            tmpCF2.c.center = c.center;
             tmpCF2.threshold = c.radius * 1.1;
+            //tmpCF2.threshold = c.radius;
             cf.push_back(tmpCF2);
 
             for(int i=0;i<sizeOfVector;i++) {
-                delete ps2[i]; // TODO delete ps
+                delete ps2[i];
             }
         }
     }
 
-    tmp1.clear();
-    tmp2.clear();
+    //tmp1.clear();
+    //tmp2.clear();
 }
 
 // return a list of reports that contain a description and time.
@@ -137,8 +142,8 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries& ts){
             }
         }
     }
-    tmp1.clear();
-    tmp2.clear();
+    //tmp1.clear();
+    //tmp2.clear();
 
     return ar;
 }
@@ -176,7 +181,11 @@ float SimpleAnomalyDetector::setThreshold(float th) {
     return th;
 }
 
+int SimpleAnomalyDetector::getRowsNumber() {
+    return this->tableSize;
+}
+
 // destructor.
 SimpleAnomalyDetector::~SimpleAnomalyDetector() {
-    cf.clear();
+    //cf.clear();
 }

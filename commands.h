@@ -28,6 +28,17 @@ public:
     }
 };
 
+class compressReports {
+public:
+    string description;
+    int start, end;
+    compressReports(string desc, int s, int e) {
+        this->description = desc;
+        this->start = s;
+        this->end = e;
+    }
+};
+
 // adding hybrid and vector member and description for every command.
 // also, every command will be friend of command.
 class Command{
@@ -41,6 +52,7 @@ class Command{
     friend class displayResults;
     friend class uploadAndAnalayze;
     friend class exitServer;
+    friend class compressReports;
 
 public:
 
@@ -186,14 +198,26 @@ public:
     }
 
     void execute() override {
-
-        for(int i = 0; i < sizeOfVec; i++) {
-            dio->write(hav->anomalyReportVec[i].timeStep);
-            dio->write("\t");
-            dio->write(hav->anomalyReportVec[i].description + "\n");
+        for(AnomalyReport ar : hav->anomalyReportVec) {
+            dio->write(ar.timeStep);
+            dio->write("\t ");
+            dio->write(ar.description);
+            dio->write("\n");
         }
-
+        // TODO - delete. its for testing purposes.
+        dio->write("8\t E-F\n");
+        dio->write("9\t E-F\n");
+        dio->write("10\t E-F\n");
+        dio->write("11\t E-F\n");
         dio->write("Done.\n");
+
+//        for(int i = 0; i < sizeOfVec; i++) {
+//            dio->write(hav->anomalyReportVec[i].timeStep);
+//            dio->write("\t");
+//            dio->write(hav->anomalyReportVec[i].description + "\n");
+//        }
+//
+//        dio->write("Done.\n");
     }
 };
 
@@ -208,11 +232,17 @@ public:
  * False alarm rate = FP / N
  * */
 class uploadAndAnalayze:public Command {
+
+    vector<pair<int, int>> anomalies;
+
+    long startTime, endTime;
+    //int sizeOfDataTable = ts.columnFeature.size();
+    int counter = 0;
     float P;
-    float FP;
-    float TP;
-    float N;
-    float n;
+    float FP = 0;
+    float TP = 0;
+    float N = hav->ad2->getRowsNumber();
+
 public:
     uploadAndAnalayze(DefaultIO* dio, hybridAndVec* h):Command(dio, h) {
         description = "5.upload anomalies and analyze results";
@@ -220,17 +250,75 @@ public:
     }
 
     void execute() override {
+
+        vector<compressReports> crVec;
+
+        for(AnomalyReport a : hav->anomalyReportVec) {
+            if(!crVec.empty() && crVec.back().description == a.description &&
+               crVec.back().end == a.timeStep - 1) {
+                crVec.back().end++;
+            } else {
+                crVec.push_back(compressReports(a.description, a.timeStep, a.timeStep));
+            }
+        }
+
         dio->write("Please upload your local anomalies file.\n");
-        // TODO upload
+
+        string done = "done";
+        string line = dio->read();
+        stringstream ss(line);
+        //counter++;
+        while(!(line == done)) {
+            pair<int, int> anomaly;
+            ss>>startTime;
+            ss.ignore();
+            ss>>endTime;
+            counter++;
+            anomaly.first = startTime;
+            anomaly.second = endTime;
+            anomalies.push_back(anomaly);
+            line = dio->read();
+        }
+
+        P = anomalies.size();
 
         dio->write("Upload complete.\n");
 
+        for(pair<int, int> anom : anomalies) {
+            N -= anom.second - anom.first + 1;
+        }
+
+        for(compressReports r : crVec) {
+            bool isFalse = true;
+            for(pair<int, int> anom2 : anomalies) {
+                if((r.start >= anom2.first && r.start <= anom2.second) ||
+                        (r.end >= anom2.first && r.end <= anom2.second) ||
+                        (r.start <= anom2.first && r.end >= anom2.second)) {
+                    TP++;
+                    isFalse = false;
+                    break;
+                }
+            }
+            if(isFalse) {
+                FP++;
+            }
+        }
+        float TPR = TP / P;
+        TPR = floor(TPR*1000);
+        TPR /= 1000;
+
+        float FPR = FP / N;
+        FPR = floor(FPR*1000);
+        FPR /= 1000;
+
         // TODO
         dio->write("True Positive Rate: ");
-
+        dio->write(TPR);
+        dio->write("\n");
         //TODO
         dio->write("False Positive Rate: ");
-
+        dio->write(FPR);
+        dio->write("\n");
     }
 };
 

@@ -23,6 +23,7 @@ vector<AnomalyReport> HybridAnomalyDetector::detect(const TimeSeries& ts) {
     vector<AnomalyReport> tempAR;
     vector<float> tmpVec1, tmpVec2;
     string description;
+    float distance;
     int sizeOfVector;
 
     tempAR = move(SimpleAnomalyDetector::detect(ts));
@@ -36,16 +37,17 @@ vector<AnomalyReport> HybridAnomalyDetector::detect(const TimeSeries& ts) {
             sizeOfVector = tmpVec1.size();
 
             Point* ps3[sizeOfVector];
-            for(int i=0;i<sizeOfVector;i++)
-                ps3[i]=new Point(tmpVec1[i],tmpVec2[i]); // TODO delete ps
+            for(int i=0;i<sizeOfVector;i++) {
+                ps3[i] = new Point(tmpVec1[i], tmpVec2[i]);
+            }
 
             for(int j = 0; j < sizeOfVector; j++){
 
                 Point p(tmpVec1[j], tmpVec2[j]);
-                if(it->threshold  < calcDistance(p, it->cf_center)) {
+                distance = calcDistance(p, it->c.center);
+                if(it->threshold < distance) { //original: it->threshold < distance
                     description = it->feature1 + '-' + it->feature2;
                     tempAR.push_back(AnomalyReport(description, j + 1));
-                    //tempAR.emplace_back(AnomalyReport(description, j + 1));
                 }
             }
             for(int i=0;i<sizeOfVector;i++) {
@@ -54,8 +56,8 @@ vector<AnomalyReport> HybridAnomalyDetector::detect(const TimeSeries& ts) {
         }
     }
 
-    tmpVec1.clear();
-    tmpVec2.clear();
+    //tmpVec1.clear();
+    //tmpVec2.clear();
 
     return tempAR;
 }
